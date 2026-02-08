@@ -95,51 +95,6 @@ export default function DistrictList() {
                     mah="calc(90vh - 150px)"
                     type={"never"}
                 >
-                    {/* {TYPE_DISTRICTS.map((type) => {
-                        const platoonsOfType = platoons
-                            .filter((platoon) => platoon.type === type)
-                            .filter((platoon) => {
-                                const lowerValue = value.toLowerCase();
-                                const numberMatch = platoon.number.toString().includes(value);
-                                const officerMatch = platoon.officer?.toLowerCase().includes(lowerValue);
-                                const studentsOfPlatoon = students.filter(s => s.districtId === platoon.id);
-                                const studentMatch = studentsOfPlatoon.some(s => s.fio.toLowerCase().includes(lowerValue));
-                                return numberMatch || officerMatch || studentMatch;
-                            })
-                            .filter((platoon) => showOnlyArchive ? platoon.isInArchive === true : !platoon.isInArchive)
-                            .sort((a, b) => a.number - b.number);
-                        if (platoonsOfType.length === 0) return null;
-                        return (
-                            <Stack align="center" key={type} mb={'xl'}>
-                                <Text>{type}</Text>
-                                {platoonsOfType.map((platoon) => (
-                                    <Group w={'100%'} key={platoon.id}>
-                                        <Button
-                                            flex={1}
-                                            onClick={() => navigate(`${platoon.id}`)}
-                                            disabled={platoon.id === id}
-                                            color={showOnlyArchive && 'orange'}
-                                        >
-                                            {platoon.number}
-                                        </Button>
-                                        {
-                                            id === platoon.id &&
-                                            <Button
-                                                onClick={() => {
-                                                    setEditPlatoon(platoon);
-                                                    modal.open();
-                                                }}
-                                                color={showOnlyArchive && 'orange'}
-                                            >
-                                                <MdModeEdit />
-                                            </Button>
-                                        }
-                                    </Group>
-                                ))}
-                            </Stack>
-                        );
-                    })} */}
-
                     {
                         filteredDistricts.map((district) => (
                             <Group w={'100%'} key={district.id} mb={'sm'}>

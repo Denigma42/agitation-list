@@ -29,7 +29,7 @@ const columns = [
         field: 'schoolName',
         headerName: 'Школа',
         headerAlign: 'center',
-        align: 'left',
+        align: 'center',
         flex: 0.4,
         resizable: false,
     },
@@ -62,7 +62,7 @@ const columns = [
         field: 'address',
         headerName: 'Адрес',
         headerAlign: 'center',
-        align: 'left',
+        align: 'center',
         flex: 0.8,
         resizable: false,
     },
@@ -74,7 +74,7 @@ export default function DistrictTable() {
     const [school, setSchool] = useState([]);
     const [editSchool, setEditSchool] = useState({});
     const [search, setSearch] = useState('');
-    const [sortModel, setSortModel] = useState([{ field: 'fio', sort: 'asc' }]);
+    const [sortModel, setSortModel] = useState([{ field: 'schoolName', sort: 'asc' }]);
 
     const [opened, { open, close }] = useDisclosure(false);
     const [openedDialog, { toggle: openDialog, close: closeDialog }] = useDisclosure(false);
@@ -95,7 +95,16 @@ export default function DistrictTable() {
         );
     }, [school, search]);
     
-    const { exportToWord } = useDownloadTableWord({ filteredSchool, data: district });
+    // Сортируем школы по имени по возрастанию
+    const sortedAndFilteredSchool = useMemo(() => {
+        return [...filteredSchool].sort((a, b) => {
+            const nameA = a.schoolName?.toLowerCase() || '';
+            const nameB = b.schoolName?.toLowerCase() || '';
+            return nameA.localeCompare(nameB);
+        });
+    }, [filteredSchool]);
+    
+    const { exportToWord } = useDownloadTableWord({ filteredSchool: sortedAndFilteredSchool, data: district });
 
     const onEditStudent = (e) => {
         setEditSchool(e.row);
@@ -104,7 +113,6 @@ export default function DistrictTable() {
 
     useEffect(() => {
         getSchools(districtId);
-        setSortModel([{ field: 'fio', sort: 'asc' }]);
     }, [districtId])
 
     return (
@@ -135,34 +143,13 @@ export default function DistrictTable() {
                 >
                     Добавить школу
                 </Button>
-                {/* <Button
-                    variant="white"
-                    onClick={exportToWord}
-                >
-                    Скачать в Word
-                </Button>
-                <Button
-                    variant="white"
-                    component="label"
-                >
-                    Импорт из Word
-                    <input
-                        type="file"
-                        hidden
-                        accept=".docx"
-                        onChange={(e) => {
-                            importFromWord(e);
-                            openDialog();
-                        }}
-                    />
-                </Button> */}
             </Group>
 
             {search && <Text c={'white'} fw={700} size="xl">Поиск по: {search}</Text>}
 
             <ScrollArea.Autosize>
                 <DataGrid
-                    rows={filteredSchool}
+                    rows={sortedAndFilteredSchool}
                     columns={columns}
                     disableColumnMenu
                     hideFooter
@@ -185,7 +172,7 @@ export default function DistrictTable() {
             </ScrollArea.Autosize>
 
             <Group justify="flex-end" w="100%">
-                <Text c={'white'} size="lg">Количество школ: {filteredSchool.length}</Text>
+                <Text c={'white'} size="lg">Количество школ: {sortedAndFilteredSchool.length}</Text>
             </Group>
 
             <SchoolModal
@@ -205,4 +192,3 @@ export default function DistrictTable() {
         </Stack>
     );
 }
-
