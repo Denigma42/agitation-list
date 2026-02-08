@@ -39,8 +39,7 @@ export default function DistrictModal({
     const addDistrict = async () => {
         const districtObject = {
             id: Date.now().toString(),
-            districtName: districtName,
-            isInArchive: false,
+            name: districtName,
         }
         const { data, error: addError } = await createDistrict(districtObject);
         if (addError) {

@@ -51,7 +51,7 @@ const createWindow = () => {
     width: width,
     height: height,
     autoHideMenuBar: true,
-    title: 'Агитационный лист',
+    title: 'Агитационный список',
     icon: path.join(__dirname, '../dist/BVL.ico'),
     webPreferences: {
       nodeIntegration: false,

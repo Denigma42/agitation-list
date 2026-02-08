@@ -5,10 +5,14 @@ const { app } = require('electron');
 // const dataFilePath = path.join(app.getPath('userData'), 'db/district.json');
 // const studentsFilePath = path.join(app.getPath('userData'), 'db/schools.json');
 
-const dataFilePath = path.join(app.getPath('userData'), '../db/district.json');
-const studentsFilePath = path.join(app.getPath('userData'), '../db/schools.json');
+const dataFilePath = path.join(app.getPath('userData'), './db/district.json');
+const studentsFilePath = path.join(app.getPath('userData'), './db/schools.json');
 
 function initializeFile() {
+    const dir = path.dirname(dataFilePath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
     if (!fs.existsSync(dataFilePath)) {
         fs.writeFileSync(dataFilePath, JSON.stringify([], null, 2));
     }
@@ -22,7 +26,8 @@ function getAllDistricts() {
         return { data };
     } catch (error) {
         console.error('Ошибка при чтении файла:', error);
-        return [];
+        // Всегда возвращаем объект с полем data, чтобы вызывающий код мог безопасно деструктурировать
+        return { data: [] };
     }
 }
 
@@ -40,14 +45,14 @@ function getDistrictById(id) {
 function addDistrict(newItem) {
     try {
         const { data } = getAllDistricts();
-        const isAlready = data.some(item => item.number === newItem.number)
+        const isAlready = data.some(item => item.name === newItem.name)
         if (isAlready) return { error: "Район уже существует!" }
         data.push(newItem);
         fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
         return { data: newItem };
     } catch (error) {
         console.error('Ошибка при добавлении данных:', error);
-        return null;
+        return { error: `Ошибка при добавлении данных: ${error.message}` };
     }
 }
 

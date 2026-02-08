@@ -18,23 +18,23 @@ export default function DistrictList() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [platoons, setPlatoons] = useState([]);
-    const [students, setStudents] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [schools, setSchools] = useState([]);
     const [value, setValue] = useState('');
-    const [editPlatoon, setEditPlatoon] = useState({});
-    const [showOnlyArchive, setShowOnlyArchive] = useState(false);
+    const [editDistrict, setEditDistrict] = useState({});
+    //const [showOnlyArchive, setShowOnlyArchive] = useState(false);
 
     const [openedModal, modal] = useDisclosure(false);
     const [openedModalSettings, modalSettings] = useDisclosure(false);
-    const [openedDrawer, drawer] = useDisclosure(false);
+    //const [openedDrawer, drawer] = useDisclosure(false);
 
-    const { getDistricts } = useGetDistricts({ setPlatoons });
-    const { getSchools } = useGetSchools({ setStudents });
+    const { getDistricts } = useGetDistricts({ setDistricts });
+    const { getSchools } = useGetSchools({ setSchools });
     const { deleteAllArchivedDistricts } = useDeleteAllArchivedDistricts();
 
     const clearArchivedPlatoons = async () => {
         if (confirm("Вы уверены, что хотите очистить архив?")) {
-            await deleteAllArchivePlatoon();
+            await deleteAllArchivedDistricts();
             window.location.reload();
         }
     }
@@ -70,7 +70,7 @@ export default function DistrictList() {
                     </Button>
                 </Group>
 
-                {showOnlyArchive &&
+                {/* {showOnlyArchive &&
                     <Group mb={'xl'}>
                         <Text fw={700} size="40px">Архив</Text>
                         <Button
@@ -80,7 +80,7 @@ export default function DistrictList() {
                             Очистить архив
                         </Button>
                     </Group>
-                }
+                } */}
 
                 {value && <Text fw={700} size="xl" mb={'xl'}>Поиск по: {value}</Text>}
 
@@ -88,7 +88,7 @@ export default function DistrictList() {
                     mah="calc(90vh - 150px)"
                     type={"never"}
                 >
-                    {TYPE_DISTRICTS.map((type) => {
+                    {/* {TYPE_DISTRICTS.map((type) => {
                         const platoonsOfType = platoons
                             .filter((platoon) => platoon.type === type)
                             .filter((platoon) => {
@@ -131,37 +131,60 @@ export default function DistrictList() {
                                 ))}
                             </Stack>
                         );
-                    })}
+                    })} */}
 
-                    {TYPE_DISTRICTS.every(type => platoons
-                        .filter((platoon) => platoon.type === type)
-                        .filter((platoon) => platoon.number.toString().includes(value)).length === 0) && (
-                            <Text align="center" c="dimmed" mt="md">Районы не найдены</Text>
-                        )}
+                    {
+                        districts.map((district) => (
+                            <Group w={'100%'} key={district.id} mb={'sm'}>
+                                <Button
+                                    flex={1}
+                                    onClick={() => navigate(`/${district.id}`)}
+                                    disabled={district.id === id}
+                                >
+                                    {district.name}
+                                </Button>
+                                {
+                                    id === district.id &&
+                                    <Button
+                                        onClick={() => {
+                                            setEditDistrict(district);
+                                            modal.open();
+                                        }}
+                                    >
+                                        <MdModeEdit />
+                                    </Button>
+                                }
+                            </Group>
+                        ))
+                    }
+
+                    {districts.every(district => district.name?.toLowerCase().includes(value.toLowerCase())) && (
+                        <Text align="center" c="dimmed" mt="md">Районы не найдены</Text>
+                    )}
                 </ScrollArea.Autosize>
             </Stack>
 
             <DistrictModal
                 opened={openedModal}
                 close={modal.close}
-                setDistricts={setPlatoons}
-                editDistrict={editPlatoon}
-                setEditDistrict={setEditPlatoon}
-                showOnlyArchive={showOnlyArchive}
+                setDistricts={setDistricts}
+                editDistrict={editDistrict}
+                setEditDistrict={setEditDistrict}
+                showOnlyArchive={false}
             />
 
             <SettingsModal
                 opened={openedModalSettings}
                 close={modalSettings.close}
-                quantityPlatoons={platoons.length}
+                quantityPlatoons={districts.length}
             />
 
-            <DrawerTable
+            {/* <DrawerTable
                 openedDrawer={openedDrawer}
                 drawer={drawer}
                 platoons={platoons}
                 students={students}
-            />
+            /> */}
         </Stack >
     );
 }

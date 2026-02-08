@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { DataGrid } from "@mui/x-data-grid";
 import useGetDistrictById from "../hooks/useGetDistrictById"
 import useGetSchools from "../hooks/useGetSchools"
-import SchoolCreateModal from "./SchoolCreateModal";
+import SchoolModal from "./SchoolModal";
 import useDownloadTableWord from "../hooks/useDownloadTableWord";
 import useImportDistrictsWord from "../hooks/useImportDistrictsWord";
 import { STATUS_SCHOOL } from "../consts"
@@ -64,8 +64,8 @@ const columns = [
 export default function DistrictTable() {
     const { id: districtId } = useParams();
 
-    const [students, setStudents] = useState([]);
-    const [editStudent, setEditStudent] = useState({});
+    const [school, setSchool] = useState([]);
+    const [editSchool, setEditSchool] = useState({});
     const [search, setSearch] = useState('');
     const [sortModel, setSortModel] = useState([{ field: 'fio', sort: 'asc' }]);
 
@@ -73,18 +73,18 @@ export default function DistrictTable() {
     const [openedDialog, { toggle: openDialog, close: closeDialog }] = useDisclosure(false);
 
     const { data } = useGetDistrictById(districtId);
-    const { getSchools } = useGetSchools({ setStudents });
+    const { getSchools } = useGetSchools({ setSchool });
     const { importFromWord, importStatus } = useImportDistrictsWord();
 
     const filteredStudents = useMemo(() => {
-        if (!search.trim()) return students;
+        if (!search.trim()) return school;
         const lowerSearch = search.trim().toLowerCase();
-        return students.filter(student =>
+        return school.filter(student =>
             student.fio?.toLowerCase().includes(lowerSearch) ||
             student.fieldOfStudy?.toLowerCase().includes(lowerSearch) ||
             student.status?.toLowerCase().includes(lowerSearch)
         );
-    }, [students, search]);
+    }, [school, search]);
 
     const enrolledStudentsCount = useMemo(() => {
         return filteredStudents.filter(student => student.status === STATUS_SCHOOL[0]).length;
@@ -93,7 +93,7 @@ export default function DistrictTable() {
     const { exportToWord } = useDownloadTableWord({ filteredStudents, data });
 
     const onEditStudent = (e) => {
-        setEditStudent(e.row);
+        setEditSchool(e.row);
         open();
     }
 
@@ -106,9 +106,9 @@ export default function DistrictTable() {
         <Stack p={'xs'} style={{ flex: '1', height: '100%' }} bg={'blue'}>
             <Group gap={'xl'}>
                 <Stack c={'white'} gap={0}>
-                    <Text fw={700}>{data?.type}</Text>
                     <Text fw={700}>Район {data?.number}</Text>
-                    {data?.transferedAt && <Text fw={700}>Дата перевода: {data?.transferedAt ? new Date(data.transferedAt).toLocaleDateString() : ''}</Text>}
+                    <Text fw={700}>{data?.name}</Text>
+                    {/* {data?.transferedAt && <Text fw={700}>Дата перевода: {data?.transferedAt ? new Date(data.transferedAt).toLocaleDateString() : ''}</Text>} */}
                 </Stack>
 
                 <Input
@@ -156,7 +156,6 @@ export default function DistrictTable() {
 
             {search && <Text c={'white'} fw={700} size="xl">Поиск по: {search}</Text>}
 
-                <Text c={'white'} fw={700}>{data?.officer}</Text>
             <ScrollArea.Autosize>
                 <DataGrid
                     rows={filteredStudents}
@@ -188,13 +187,13 @@ export default function DistrictTable() {
                 <Text c={'white'} size="lg">Количество школ: {enrolledStudentsCount}</Text>
             </Group>
 
-            <SchoolCreateModal
+            <SchoolModal
                 opened={opened}
                 close={close}
                 districtId={districtId}
-                setStudents={setStudents}
-                editStudent={editStudent}
-                setEditStudent={setEditStudent}
+                setSchool={setSchool}
+                editSchool={editSchool}
+                setEditSchool={setEditSchool}
             />
 
             <Dialog opened={openedDialog} withCloseButton onClose={closeDialog} size="lg" radius="md">

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { app } = require('electron');
-const studentsFilePath = path.join(app.getPath('userData'), 'db/schools.json');
+const studentsFilePath = path.join(app.getPath('userData'), './db/schools.json');
 
 function initializeSchoolsFile() {
     if (!fs.existsSync(studentsFilePath)) {
@@ -36,12 +36,12 @@ function getSchoolById(id) {
     }
 }
 
-function addSchool(newStudent) {
+function addSchool(newSchool) {
     try {
         const { data } = getAllSchools();
-        data.push(newStudent);
+        data.push(newSchool);
         fs.writeFileSync(studentsFilePath, JSON.stringify(data, null, 2));
-        return { data: newStudent };
+        return { data: newSchool };
     } catch (error) {
         console.error('Ошибка при добавлении школы:', error);
         return { error: `Ошибка при добавлении школы: ${error}` };
