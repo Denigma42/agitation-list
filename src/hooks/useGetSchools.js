@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-export default function useGetSchools({setSchools}) {
+export default function useGetSchools({setSchool}) {
     const [error, setError] = useState(null);
 
     const getSchools = async (districtId) => {
         try {
             const { data, error } = await window.electronAPI.getAllSchools(districtId);
-            setSchools((data || []).sort((a, b) => a.fio.localeCompare(b.fio)));
+            setSchool(data);
             setError(error || null);
         } catch (e) {
             setError(e);

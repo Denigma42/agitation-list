@@ -26,37 +26,44 @@ const columns = [
         }
     },
     {
-        field: 'fio',
-        headerName: 'ФИО',
+        field: 'schoolName',
+        headerName: 'Школа',
         headerAlign: 'center',
-        align: 'center',
-        flex: 0.5,
+        align: 'left',
+        flex: 0.4,
         resizable: false,
     },
     {
-        field: 'juniorCommander',
-        headerName: 'Мл. командиры',
+        field: 'classGroup',
+        headerName: 'Класс',
         headerAlign: 'center',
         align: 'center',
         flex: 0.25,
         resizable: false,
     },
     {
-        field: 'fieldOfStudy',
-        headerName: 'Уч. группа',
-        type: 'number',
+        field: 'responsible',
+        headerName: 'Ответственный',
         headerAlign: 'center',
         align: 'center',
-        flex: 0.25,
+        flex: 1,
+        resizable: false,
+    },
+    {
+        field: 'date',
+        headerName: 'Дата',
+        headerAlign: 'center',
+        align: 'center',
+        flex: 0.3,
         resizable: false,
         sortable: false
     },
     {
-        field: 'status',
-        headerName: 'Статус',
+        field: 'address',
+        headerName: 'Адрес',
         headerAlign: 'center',
-        align: 'center',
-        flex: 0.25,
+        align: 'left',
+        flex: 0.8,
         resizable: false,
     },
 ];
@@ -72,25 +79,23 @@ export default function DistrictTable() {
     const [opened, { open, close }] = useDisclosure(false);
     const [openedDialog, { toggle: openDialog, close: closeDialog }] = useDisclosure(false);
 
-    const { data } = useGetDistrictById(districtId);
+    const { data: district } = useGetDistrictById(districtId);
     const { getSchools } = useGetSchools({ setSchool });
     const { importFromWord, importStatus } = useImportDistrictsWord();
 
-    const filteredStudents = useMemo(() => {
+    const filteredSchool = useMemo(() => {
         if (!search.trim()) return school;
         const lowerSearch = search.trim().toLowerCase();
-        return school.filter(student =>
-            student.fio?.toLowerCase().includes(lowerSearch) ||
-            student.fieldOfStudy?.toLowerCase().includes(lowerSearch) ||
-            student.status?.toLowerCase().includes(lowerSearch)
+        return school.filter(school =>
+            school.schoolName?.toLowerCase().includes(lowerSearch) ||
+            school.classGroup?.toLowerCase().includes(lowerSearch) ||
+            school.responsible?.toLowerCase().includes(lowerSearch) ||
+            school.date?.toLowerCase().includes(lowerSearch) ||
+            school.address?.toLowerCase().includes(lowerSearch)
         );
     }, [school, search]);
-
-    const enrolledStudentsCount = useMemo(() => {
-        return filteredStudents.filter(student => student.status === STATUS_SCHOOL[0]).length;
-    }, [filteredStudents]);
-
-    const { exportToWord } = useDownloadTableWord({ filteredStudents, data });
+    
+    const { exportToWord } = useDownloadTableWord({ filteredSchool, data: district });
 
     const onEditStudent = (e) => {
         setEditSchool(e.row);
@@ -103,11 +108,10 @@ export default function DistrictTable() {
     }, [districtId])
 
     return (
-        <Stack p={'xs'} style={{ flex: '1', height: '100%' }} bg={'blue'}>
+        <Stack p={'xs'} style={{ flex: '1', height: '100%' }} bg={'green'}>
             <Group gap={'xl'}>
                 <Stack c={'white'} gap={0}>
-                    <Text fw={700}>Район {data?.number}</Text>
-                    <Text fw={700}>{data?.name}</Text>
+                    <Text fw={700}>{district?.name}</Text>
                     {/* {data?.transferedAt && <Text fw={700}>Дата перевода: {data?.transferedAt ? new Date(data.transferedAt).toLocaleDateString() : ''}</Text>} */}
                 </Stack>
 
@@ -131,7 +135,7 @@ export default function DistrictTable() {
                 >
                     Добавить школу
                 </Button>
-                <Button
+                {/* <Button
                     variant="white"
                     onClick={exportToWord}
                 >
@@ -151,14 +155,14 @@ export default function DistrictTable() {
                             openDialog();
                         }}
                     />
-                </Button>
+                </Button> */}
             </Group>
 
             {search && <Text c={'white'} fw={700} size="xl">Поиск по: {search}</Text>}
 
             <ScrollArea.Autosize>
                 <DataGrid
-                    rows={filteredStudents}
+                    rows={filteredSchool}
                     columns={columns}
                     disableColumnMenu
                     hideFooter
@@ -169,9 +173,6 @@ export default function DistrictTable() {
                     sortingOrder={['asc', 'desc']}
                     getRowId={(row) => row.id}
                     getRowClassName={(params) => {
-                        if (params.row.status !== STATUS_SCHOOL[0]) {
-                            return 'not-enrolled';
-                        }
                         return params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd';
                     }}
                     sx={{
@@ -184,7 +185,7 @@ export default function DistrictTable() {
             </ScrollArea.Autosize>
 
             <Group justify="flex-end" w="100%">
-                <Text c={'white'} size="lg">Количество школ: {enrolledStudentsCount}</Text>
+                <Text c={'white'} size="lg">Количество школ: {filteredSchool.length}</Text>
             </Group>
 
             <SchoolModal

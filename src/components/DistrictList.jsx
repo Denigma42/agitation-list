@@ -19,7 +19,7 @@ export default function DistrictList() {
     const navigate = useNavigate();
 
     const [districts, setDistricts] = useState([]);
-    const [schools, setSchools] = useState([]);
+    const [school, setSchool] = useState([]);
     const [value, setValue] = useState('');
     const [editDistrict, setEditDistrict] = useState({});
     //const [showOnlyArchive, setShowOnlyArchive] = useState(false);
@@ -29,7 +29,7 @@ export default function DistrictList() {
     //const [openedDrawer, drawer] = useDisclosure(false);
 
     const { getDistricts } = useGetDistricts({ setDistricts });
-    const { getSchools } = useGetSchools({ setSchools });
+    const { getSchools } = useGetSchools({ setSchool });
     const { deleteAllArchivedDistricts } = useDeleteAllArchivedDistricts();
 
     const clearArchivedPlatoons = async () => {
@@ -38,6 +38,13 @@ export default function DistrictList() {
             window.location.reload();
         }
     }
+
+    const filteredDistricts = districts.filter(district => {
+        const searchTerm = value.toLowerCase();
+        const districtName = district.name?.toLowerCase() || '';
+        
+        return districtName.includes(searchTerm);
+    });
 
     useEffect(() => {
         getDistricts();
@@ -134,7 +141,7 @@ export default function DistrictList() {
                     })} */}
 
                     {
-                        districts.map((district) => (
+                        filteredDistricts.map((district) => (
                             <Group w={'100%'} key={district.id} mb={'sm'}>
                                 <Button
                                     flex={1}
@@ -158,7 +165,7 @@ export default function DistrictList() {
                         ))
                     }
 
-                    {districts.every(district => district.name?.toLowerCase().includes(value.toLowerCase())) && (
+                    {filteredDistricts.length===0 && (
                         <Text align="center" c="dimmed" mt="md">Районы не найдены</Text>
                     )}
                 </ScrollArea.Autosize>

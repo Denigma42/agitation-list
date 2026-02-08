@@ -16,11 +16,12 @@ export default function DistrictModal({
     showOnlyArchive,
 }) {
     const navigate = useNavigate();
-
+    
     const [openedDialog, { toggle: openDialog, close: closeDialog }] = useDisclosure(false);
-    const [districtName, setDistrictName] = useState(editDistrict?.districtName || "");
+    const [districtName, setDistrictName] = useState(editDistrict?.name || "");
+    console.log(districtName);
     const disabledButtonAdd = !districtName;
-    const editButtonDisabled = disabledButtonAdd || (districtName === editDistrict?.districtName);
+    const editButtonDisabled = disabledButtonAdd || (districtName === editDistrict?.name);
 
     const { createDistrict } = useAddDistrict();
     const { updateDistrict } = useUpdateDistrict();
@@ -52,7 +53,7 @@ export default function DistrictModal({
     }
 
     const handleEditDistrict = async () => {
-        await updateDistrict(editDistrict.id, { districtName: districtName });
+        await updateDistrict(editDistrict.id, { name: districtName });
         //setDistricts(prevDistricts => prevDistricts.map(district => district.id === editPlatoon.id ? { ...district, ...data } : district))
         onCloseModal();
         window.location.reload()
@@ -65,7 +66,7 @@ export default function DistrictModal({
     }
 
     const confirmDeleteDistrict = async () => {
-        if (deleteInput === String(editDistrict.districtName)) {
+        if (deleteInput === String(editDistrict.name)) {
             await updateDistrict(editDistrict.id, { districtName: districtName, isInArchive: true, transferedAt: null });
             setDistricts(prevDistricts => prevDistricts.filter(district => district.id !== editDistrict.id))
             setShowDeleteModal(false);
@@ -83,7 +84,7 @@ export default function DistrictModal({
     }
 
     useEffect(() => {
-        setDistrictName(editDistrict?.districtName || "");
+        setDistrictName(editDistrict?.name || "");
     }, [editDistrict]);
 
     return (
