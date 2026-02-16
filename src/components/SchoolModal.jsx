@@ -27,6 +27,7 @@ export default function SchoolModal({
     const disabledButtonAdd = !schoolName || !responsible || !date || !classGroup || !address;
     const editButtonDisabled = disabledButtonAdd || (
         schoolName === editSchool.schoolName &&
+        isCadetClass === editSchool.isCadetClass &&
         responsible === editSchool.responsible &&
         date === editSchool.date &&
         classGroup === editSchool.classGroup &&
@@ -60,7 +61,7 @@ export default function SchoolModal({
     }
 
     const handleEditSchool = async () => {
-        const { data } = await updateSchool(editSchool.id, { schoolName, responsible, date, classGroup, address });
+        const { data } = await updateSchool(editSchool.id, { schoolName, isCadetClass, responsible, date, classGroup, address });
         setSchool(prevStudents => prevStudents.map(student => student.id === editSchool.id ? { ...student, ...data } : student))
         onCloseModal();
         window.location.reload();

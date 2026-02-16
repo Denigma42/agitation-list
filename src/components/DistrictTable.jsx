@@ -159,13 +159,16 @@ export default function DistrictTable() {
                     sortingOrder={['asc', 'desc']}
                     getRowId={(row) => row.id}
                     getRowClassName={(params) => {
-                        return params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd';
+                        const evenOdd = params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd';
+                        const cadet = params.row?.isCadetClass ? ' cadet-class' : '';
+                        return evenOdd + cadet;
                     }}
                     sx={{
                         border: 0,
                         '& .even': { backgroundColor: '#f2f2f2' },
                         '& .odd': { backgroundColor: '#ffffff' },
                         '& .not-enrolled': { backgroundColor: '#fa6666' },
+                        '& .cadet-class': { backgroundColor: '#b3d4fc !important' },
                     }}
                 />
             </ScrollArea.Autosize>
