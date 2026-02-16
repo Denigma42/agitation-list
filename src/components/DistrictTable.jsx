@@ -56,7 +56,6 @@ const columns = [
         align: 'center',
         flex: 0.3,
         resizable: false,
-        sortable: false
     },
     {
         field: 'address',

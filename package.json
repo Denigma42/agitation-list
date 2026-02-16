@@ -1,7 +1,7 @@
 {
   "name": "agitation-list",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "main": "electron/index.cjs",
   "scripts": {
@@ -52,7 +52,7 @@
     "wait-on": "^8.0.5"
   },
   "build": {
-    "appId": "com.vuc.contingent",
+    "appId": "agitation-list",
     "productName": "Агитационный список",
     "directories": {
       "buildResources": "dist",

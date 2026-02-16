@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Button, CloseButton, Group, Input, Modal, Select, Stack } from "@mantine/core";
+import { Button, CloseButton, Group, Input, Modal, Select, Stack, Text } from "@mantine/core";
 import { STATUS_SCHOOL, STATUS_SCHOOL_KURSANT } from "../consts";
 import useAddSchool from "../hooks/useAddSchool";
 import useUpdateSchool from "../hooks/useUpdateSchool";
@@ -90,74 +90,91 @@ export default function SchoolModal({
             >
                 <Stack>
                     <Group justify="space-between" grow>
-                        <Input
-                            placeholder="Название школы"
-                            value={schoolName}
-                            onChange={(e) => setSchoolName(e.target.value)}
-                            data-autofocus
-                            rightSectionPointerEvents="all"
-                            rightSection={
-                                <CloseButton
-                                    onClick={() => setSchoolName("")}
-                                    style={{ display: schoolName ? undefined : 'none' }}
-                                />
-                            }
-                        />
+                        <Stack gap={0}>
+                            <Text size="sm" c={'gray.7'} fs="italic">Название школы</Text>
+                            <Input
+                                placeholder="Название школы"
+                                value={schoolName}
+                                onChange={(e) => setSchoolName(e.target.value)}
+                                data-autofocus
+                                rightSectionPointerEvents="all"
+                                rightSection={
+                                    <CloseButton
+                                        onClick={() => setSchoolName("")}
+                                        style={{ display: schoolName ? undefined : 'none' }}
+                                    />
+                                }
+                            />
+                        </Stack>
 
-                        <Input
-                            placeholder="Ответственный"
-                            value={responsible}
-                            onChange={(e) => setResponsible(e.target.value)}
-                            rightSectionPointerEvents="all"
-                            rightSection={
-                                <CloseButton
-                                    onClick={() => setResponsible("")}
-                                    style={{ display: responsible ? undefined : 'none' }}
-                                />
-                            }
+                        <Stack gap={0}>
+                            <Text size="sm" c={'gray.7'} fs="italic">Ответственный</Text>
+                            <Input
+                                placeholder="Ответственный"
+                                value={responsible}
+                                onChange={(e) => setResponsible(e.target.value)}
+                                rightSectionPointerEvents="all"
+                                rightSection={
+                                    <CloseButton
+                                        onClick={() => setResponsible("")}
+                                        style={{ display: responsible ? undefined : 'none' }}
+                                    />
+                                }
 
-                        />
+                            />
+                        </Stack>
                     </Group>
 
                     <Group justify="space-between">
-                        <Input
-                            placeholder="Класс"
-                            value={classGroup}
-                            onChange={(e) => setClassGroup(e.target.value)}
-                            rightSectionPointerEvents="all"
-                            rightSection={
-                                <CloseButton
-                                    onClick={() => setClassGroup("")}
-                                    style={{ display: classGroup ? undefined : 'none' }}
-                                />
-                            }
-                        />
-                        <Input
-                            placeholder="Адресс"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            rightSectionPointerEvents="all"
-                            rightSection={
-                                <CloseButton
-                                    onClick={() => setAddress("")}
-                                    style={{ display: address ? undefined : 'none' }}
-                                />
-                            }
+                        <Stack gap={0}>
+                            <Text size="sm" c={'gray.7'} fs="italic">Класс</Text>
+                            <Input
+                                placeholder="Класс"
+                                value={classGroup}
+                                onChange={(e) => setClassGroup(e.target.value)}
+                                rightSectionPointerEvents="all"
+                                rightSection={
+                                    <CloseButton
+                                        onClick={() => setClassGroup("")}
+                                        style={{ display: classGroup ? undefined : 'none' }}
+                                    />
+                                }
+                            />
+                        </Stack>
 
-                        />
-                        <Input
-                            placeholder="Дата"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            rightSectionPointerEvents="all"
-                            rightSection={
-                                <CloseButton
-                                    onClick={() => setDate("")}
-                                    style={{ display: date ? undefined : 'none' }}
-                                />
-                            }
+                        <Stack gap={0}>
+                            <Text size="sm" c={'gray.7'} fs="italic">Адресс</Text>
+                            <Input
+                                placeholder="Адресс"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                rightSectionPointerEvents="all"
+                                rightSection={
+                                    <CloseButton
+                                        onClick={() => setAddress("")}
+                                        style={{ display: address ? undefined : 'none' }}
+                                    />
+                                }
 
-                        />
+                            />
+                        </Stack>
+
+                        <Stack gap={0}>
+                            <Text size="sm" c={'gray.7'} fs="italic">Дата</Text>
+                            <Input
+                                placeholder="Дата"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                rightSectionPointerEvents="all"
+                                rightSection={
+                                    <CloseButton
+                                        onClick={() => setDate("")}
+                                        style={{ display: date ? undefined : 'none' }}
+                                    />
+                                }
+
+                            />
+                        </Stack>
                     </Group>
 
                     <Group grow>
