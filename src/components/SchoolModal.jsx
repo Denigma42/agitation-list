@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Button, CloseButton, Group, Input, Modal, Select, Stack, Text } from "@mantine/core";
+import { Button, Checkbox, CloseButton, Group, Input, Modal, Select, Stack, Text } from "@mantine/core";
 import { STATUS_SCHOOL, STATUS_SCHOOL_KURSANT } from "../consts";
 import useAddSchool from "../hooks/useAddSchool";
 import useUpdateSchool from "../hooks/useUpdateSchool";
@@ -14,6 +14,7 @@ export default function SchoolModal({
     setEditSchool,
 }) {
     const [schoolName, setSchoolName] = useState(editSchool?.schoolName || '');
+    const [isCadetClass, setIsCadetClass] = useState(editSchool?.isCadetClass || false);
     const [classGroup, setClassGroup] = useState(editSchool?.classGroup || '');
     const [responsible, setResponsible] = useState(editSchool?.responsible || '');
     const [date, setDate] = useState(editSchool?.date || '');
@@ -34,6 +35,7 @@ export default function SchoolModal({
 
     const onCloseModal = () => {
         setSchoolName('');
+        setIsCadetClass(false);
         setClassGroup('');
         setResponsible('');
         setEditSchool({})
@@ -45,6 +47,7 @@ export default function SchoolModal({
             id: Date.now().toString(),
             districtId: districtId,
             schoolName,
+            isCadetClass,
             classGroup,
             responsible,
             date,
@@ -72,6 +75,7 @@ export default function SchoolModal({
 
     useEffect(() => {
         setSchoolName(editSchool?.schoolName || "");
+        setIsCadetClass(editSchool?.isCadetClass || false);
         setClassGroup(editSchool?.classGroup || "");
         setResponsible(editSchool?.responsible || "");
         setDate(editSchool?.date || "");
@@ -91,9 +95,9 @@ export default function SchoolModal({
                 <Stack>
                     <Group justify="space-between" grow>
                         <Stack gap={0}>
-                            <Text size="sm" c={'gray.7'} fs="italic">Название школы</Text>
+                            <Text size="sm" c={'gray.7'} fs="italic">Наименование организации</Text>
                             <Input
-                                placeholder="Название школы"
+                                placeholder="Наименование организации"
                                 value={schoolName}
                                 onChange={(e) => setSchoolName(e.target.value)}
                                 data-autofocus
@@ -127,7 +131,14 @@ export default function SchoolModal({
 
                     <Group justify="space-between">
                         <Stack gap={0}>
-                            <Text size="sm" c={'gray.7'} fs="italic">Класс</Text>
+                            <Checkbox
+                                label="Это кадетский класс?"
+                                size="xs"
+                                mb={'xs'}
+                                checked={isCadetClass}
+                                onChange={(event) => setIsCadetClass(event.currentTarget.checked)}
+                            />
+                            {/* <Text size="sm" c={'gray.7'} fs="italic">Класс</Text> */}
                             <Input
                                 placeholder="Класс"
                                 value={classGroup}
@@ -141,7 +152,9 @@ export default function SchoolModal({
                                 }
                             />
                         </Stack>
+                    </Group>
 
+                    <Group justify="space-between">
                         <Stack gap={0}>
                             <Text size="sm" c={'gray.7'} fs="italic">Адресс</Text>
                             <Input

@@ -27,7 +27,7 @@ const columns = [
     },
     {
         field: 'schoolName',
-        headerName: 'Школа',
+        headerName: 'Организация',
         headerAlign: 'center',
         align: 'center',
         flex: 0.4,
@@ -171,7 +171,7 @@ export default function DistrictTable() {
             </ScrollArea.Autosize>
 
             <Group justify="flex-end" w="100%">
-                <Text c={'white'} size="lg">Количество школ: {sortedAndFilteredSchool.length}</Text>
+                <Text c={'white'} size="lg">Количество организаций: {sortedAndFilteredSchool.length}</Text>
             </Group>
 
             <SchoolModal
