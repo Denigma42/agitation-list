@@ -68,6 +68,9 @@ export default function SchoolModal({
     }
 
     const handleDeleteSchool = async () => {
+        const confirmed = window.confirm('Вы уверены, что хотите удалить эту школу?');
+        if (!confirmed) return;
+        
         await deleteSchool(editSchool.id);
         setSchool(prevStudents => prevStudents.filter(student => student.id !== editSchool.id))
         onCloseModal();

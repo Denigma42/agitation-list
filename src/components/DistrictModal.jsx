@@ -67,10 +67,7 @@ export default function DistrictModal({
 
     const confirmDeleteDistrict = async () => {
         if (deleteInput === String(editDistrict.name)) {
-            await updateDistrict(editDistrict.id, { districtName: districtName, isInArchive: true, transferedAt: null });
-            setDistricts(prevDistricts => prevDistricts.filter(district => district.id !== editDistrict.id))
-            setShowDeleteModal(false);
-            onCloseModal();
+            await deleteDistrict(editDistrict.id);
             navigate('/')
             window.location.reload();
         } else {
@@ -191,9 +188,9 @@ export default function DistrictModal({
             {/* Модальное окно удаления взвода */}
             <Modal opened={showDeleteModal} onClose={cancelDeleteDistrict} centered title="Удалить район?" size="md">
                 <Stack>
-                    <Text>Для подтверждения удаления введите название района: <b>{editDistrict?.districtName}</b></Text>
+                    <Text>Для подтверждения удаления введите название района: <b>{editDistrict?.name}</b></Text>
                     <Input value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="Введите название района..." />
-                    {deleteError && <Text color="red" size="sm">{deleteError}</Text>}
+                    {deleteError && <Text c="red" size="sm">{deleteError}</Text>}
                     <Group justify="flex-end">
                         <Button onClick={cancelDeleteDistrict} variant="default">Отменить</Button>
                         <Button onClick={confirmDeleteDistrict} color="red">Удалить</Button>
