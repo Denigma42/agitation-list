@@ -70,7 +70,7 @@ export default function SchoolModal({
     const handleDeleteSchool = async () => {
         const confirmed = window.confirm('Вы уверены, что хотите удалить эту школу?');
         if (!confirmed) return;
-        
+
         await deleteSchool(editSchool.id);
         setSchool(prevStudents => prevStudents.filter(student => student.id !== editSchool.id))
         onCloseModal();
@@ -156,9 +156,6 @@ export default function SchoolModal({
                                 }
                             />
                         </Stack>
-                    </Group>
-
-                    <Group justify="space-between">
                         <Stack gap={0}>
                             <Text size="sm" c={'gray.7'} fs="italic">Адресс</Text>
                             <Input

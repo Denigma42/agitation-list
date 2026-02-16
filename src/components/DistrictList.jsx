@@ -75,6 +75,9 @@ export default function DistrictList() {
                     <Button variant="outline" onClick={modal.open}>
                         +
                     </Button>
+                    <Button variant="outline" onClick={()=>window.location.reload()}>
+                        🔃
+                    </Button>
                 </Group>
 
                 {/* {showOnlyArchive &&
