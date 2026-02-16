@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Button, CloseButton, Dialog, Group, Input, ScrollArea, Stack, Text } from "@mantine/core";
+import { Button, Checkbox, CloseButton, Dialog, Group, Input, ScrollArea, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { DataGrid } from "@mui/x-data-grid";
 import useGetDistrictById from "../hooks/useGetDistrictById"
@@ -74,7 +74,7 @@ export default function DistrictTable() {
     const [editSchool, setEditSchool] = useState({});
     const [search, setSearch] = useState('');
     const [sortModel, setSortModel] = useState([{ field: 'schoolName', sort: 'asc' }]);
-
+    const [showOnlyCadetClasses, setShowOnlyCadetClasses] = useState(false);
     const [opened, { open, close }] = useDisclosure(false);
     const [openedDialog, { toggle: openDialog, close: closeDialog }] = useDisclosure(false);
 
@@ -83,26 +83,40 @@ export default function DistrictTable() {
     const { importFromWord, importStatus } = useImportDistrictsWord();
 
     const filteredSchool = useMemo(() => {
-        if (!search.trim()) return school;
-        const lowerSearch = search.trim().toLowerCase();
-        return school.filter(school =>
-            school.schoolName?.toLowerCase().includes(lowerSearch) ||
-            school.classGroup?.toLowerCase().includes(lowerSearch) ||
-            school.responsible?.toLowerCase().includes(lowerSearch) ||
-            school.date?.toLowerCase().includes(lowerSearch) ||
-            school.address?.toLowerCase().includes(lowerSearch)
-        );
-    }, [school, search]);
-    
-    // Сортируем школы по имени по возрастанию
+        let result = school;
+
+        // Фильтр по поиску
+        if (search.trim()) {
+            const lowerSearch = search.trim().toLowerCase();
+            result = result.filter(school =>
+                school.schoolName?.toLowerCase().includes(lowerSearch) ||
+                school.classGroup?.toLowerCase().includes(lowerSearch) ||
+                school.responsible?.toLowerCase().includes(lowerSearch) ||
+                school.date?.toLowerCase().includes(lowerSearch) ||
+                school.address?.toLowerCase().includes(lowerSearch)
+            );
+        }
+
+        // Фильтр по кадетским классам
+        if (showOnlyCadetClasses) {
+            result = result.filter(school => school.isCadetClass === true);
+        }
+
+        return result;
+    }, [school, search, showOnlyCadetClasses]);
+
+    // Сначала кадетские классы, затем по имени организации по возрастанию
     const sortedAndFilteredSchool = useMemo(() => {
         return [...filteredSchool].sort((a, b) => {
+            const cadetA = a.isCadetClass ? 1 : 0;
+            const cadetB = b.isCadetClass ? 1 : 0;
+            if (cadetB !== cadetA) return cadetB - cadetA; // кадетские первыми (1 > 0)
             const nameA = a.schoolName?.toLowerCase() || '';
             const nameB = b.schoolName?.toLowerCase() || '';
             return nameA.localeCompare(nameB);
         });
     }, [filteredSchool]);
-    
+
     const { exportToWord } = useDownloadTableWord({ filteredSchool: sortedAndFilteredSchool, data: district });
 
     const onEditStudent = (e) => {
@@ -116,7 +130,7 @@ export default function DistrictTable() {
 
     return (
         <Stack p={'xs'} style={{ flex: '1', height: '100%' }} bg={'green'}>
-            <Group gap={'xl'}>
+            <Group gap={'xl'} mb={'lg'}>
                 <Stack c={'white'} gap={0}>
                     <Text fw={700}>{district?.name}</Text>
                     {/* {data?.transferedAt && <Text fw={700}>Дата перевода: {data?.transferedAt ? new Date(data.transferedAt).toLocaleDateString() : ''}</Text>} */}
@@ -146,6 +160,28 @@ export default function DistrictTable() {
 
             {search && <Text c={'white'} fw={700} size="xl">Поиск по: {search}</Text>}
 
+            <Group justify="flex-end">
+                <Checkbox
+                    label={<Text c="white">Показать только кадетские классы</Text>}
+                    size="xs"
+                    color="indigo"
+                    checked={showOnlyCadetClasses}
+                    onChange={(event) => setShowOnlyCadetClasses(event.currentTarget.checked)}
+                    styles={{
+                        labelWrapper: {
+                            display: 'flex',
+                            alignItems: 'center',
+                        },
+                        label: {
+                            // если нужно подкорректировать отступы
+                            paddingLeft: 8,
+                        },
+                        body: {
+                            alignItems: 'center', // выравнивание чекбокса и label по центру
+                        }
+                    }}
+                />
+            </Group>
             <ScrollArea.Autosize>
                 <DataGrid
                     rows={sortedAndFilteredSchool}
@@ -154,7 +190,7 @@ export default function DistrictTable() {
                     hideFooter
                     onRowClick={onEditStudent}
                     disableRowSelectionOnClick
-                    sortModel={sortModel}
+                    //sortModel={sortModel}
                     onSortModelChange={setSortModel}
                     sortingOrder={['asc', 'desc']}
                     getRowId={(row) => row.id}
