@@ -9,14 +9,24 @@ const {
   updateDistrict,
   deleteDistrict,
   deleteAllDistricts,
-  deleteAllArchivedDistricts } = require('./districtHooks.cjs');
+  deleteAllArchivedDistricts 
+} = require('./districtHooks.cjs');
 
 const {
   getAllSchools,
   getSchoolById,
   addSchool,
   updateSchool,
-  deleteSchool } = require('./schoolHooks.cjs');
+  deleteSchool 
+} = require('./schoolHooks.cjs');
+
+const {
+  getAllMicroDistricts,
+  getMicroDistrictById,
+  addMicroDistrict,
+  updateMicroDistrict,
+  deleteMicroDistrict
+} = require('./microDistrictHooks.cjs');
 
 const fs = require('fs');
 const fsp = fs.promises;
@@ -122,6 +132,27 @@ ipcMain.handle('update-school', async (event, id, student) => {
 
 ipcMain.handle('delete-school', async (event, id) => {
   return deleteSchool(id);
+});
+
+// IPC для микрорайонов
+ipcMain.handle('get-all-micro-districts', async (event, districtId) => {
+  return getAllMicroDistricts(districtId);
+});
+
+ipcMain.handle('get-micro-district-by-id', async (event, id) => {
+  return getMicroDistrictById(id);
+});
+
+ipcMain.handle('add-micro-district', async (event, data) => {
+  return addMicroDistrict(data);
+});
+
+ipcMain.handle('update-micro-district', async (event, id, data) => {
+  return updateMicroDistrict(id, data);
+});
+
+ipcMain.handle('delete-micro-district', async (event, id) => {
+  return deleteMicroDistrict(id);
 });
 
 app.whenReady().then(async () => {

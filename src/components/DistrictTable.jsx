@@ -2,70 +2,13 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Checkbox, CloseButton, Dialog, Group, Input, ScrollArea, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { DataGrid } from "@mui/x-data-grid";
-import useGetDistrictById from "../hooks/useGetDistrictById"
-import useGetSchools from "../hooks/useGetSchools"
+import useGetDistrictById from "../hooks/useGetDistrictById";
+import useGetSchools from "../hooks/useGetSchools";
 import SchoolModal from "./SchoolModal";
 import useDownloadTableWord from "../hooks/useDownloadTableWord";
 import useImportDistrictsWord from "../hooks/useImportDistrictsWord";
-import { STATUS_SCHOOL } from "../consts"
-
-const columns = [
-    {
-        field: 'order',
-        headerName: '№',
-        width: 60,
-        headerAlign: 'center',
-        align: 'center',
-        resizable: false,
-        sortable: false,
-        filterable: false,
-        renderCell: (params) => {
-            const allRowIds = params.api.getAllRowIds();
-            return allRowIds.indexOf(params.id) + 1;
-        }
-    },
-    {
-        field: 'schoolName',
-        headerName: 'Организация',
-        headerAlign: 'center',
-        align: 'center',
-        flex: 0.4,
-        resizable: false,
-    },
-    {
-        field: 'classGroup',
-        headerName: 'Класс',
-        headerAlign: 'center',
-        align: 'center',
-        flex: 0.25,
-        resizable: false,
-    },
-    {
-        field: 'responsible',
-        headerName: 'Ответственный',
-        headerAlign: 'center',
-        align: 'center',
-        flex: 1,
-        resizable: false,
-    },
-    {
-        field: 'date',
-        headerName: 'Дата',
-        headerAlign: 'center',
-        align: 'center',
-        flex: 0.3,
-        resizable: false,
-    },
-    {
-        field: 'address',
-        headerName: 'Адрес',
-        headerAlign: 'center',
-        align: 'center',
-        flex: 0.8,
-        resizable: false,
-    },
-];
+import MicroTable from "./MicroDistrictTable";
+import MicroDistrictTableModal from "./MicroDistrictTableModal";
 
 export default function DistrictTable() {
     const { id: districtId } = useParams();
@@ -73,7 +16,6 @@ export default function DistrictTable() {
     const [school, setSchool] = useState([]);
     const [editSchool, setEditSchool] = useState({});
     const [search, setSearch] = useState('');
-    const [sortModel, setSortModel] = useState([{ field: 'schoolName', sort: 'asc' }]);
     const [showOnlyCadetClasses, setShowOnlyCadetClasses] = useState(false);
     const [opened, { open, close }] = useDisclosure(false);
     const [openedDialog, { toggle: openDialog, close: closeDialog }] = useDisclosure(false);
@@ -82,10 +24,31 @@ export default function DistrictTable() {
     const { getSchools } = useGetSchools({ setSchool });
     const { importFromWord, importStatus } = useImportDistrictsWord();
 
+    const [microModalOpened, { open: openMicroModal, close: closeMicroModal }] = useDisclosure(false);
+    const [currentMicroTitle, setCurrentMicroTitle] = useState('');
+
+    // Функция открытия модалки с выбранным микрорайоном
+    const handleEditMicroDistrict = (title) => {
+        setCurrentMicroTitle(title);
+        openMicroModal();
+    };
+
+    // Функция переименования (обновляет локальное состояние школ)
+    const handleRenameMicroDistrict = (newTitle) => {
+        if (!newTitle || newTitle === currentMicroTitle) return;
+        setSchool(prev => prev.map(school =>
+            school.microDistrictTitle === currentMicroTitle
+                ? { ...school, microDistrictTitle: newTitle }
+                : school
+        ));
+        closeMicroModal();
+    };
+
+
+    // Фильтрация и сортировка школ
     const filteredSchool = useMemo(() => {
         let result = school;
 
-        // Фильтр по поиску
         if (search.trim()) {
             const lowerSearch = search.trim().toLowerCase();
             result = result.filter(school =>
@@ -93,11 +56,11 @@ export default function DistrictTable() {
                 school.classGroup?.toLowerCase().includes(lowerSearch) ||
                 school.responsible?.toLowerCase().includes(lowerSearch) ||
                 school.date?.toLowerCase().includes(lowerSearch) ||
-                school.address?.toLowerCase().includes(lowerSearch)
+                school.address?.toLowerCase().includes(lowerSearch) ||
+                school.microDistrictTitle?.toLowerCase().includes(lowerSearch)
             );
         }
 
-        // Фильтр по кадетским классам
         if (showOnlyCadetClasses) {
             result = result.filter(school => school.isCadetClass === true);
         }
@@ -105,35 +68,67 @@ export default function DistrictTable() {
         return result;
     }, [school, search, showOnlyCadetClasses]);
 
-    // Сначала кадетские классы, затем по имени организации по возрастанию
+    // Сортировка: кадетские первыми, затем по названию организации
     const sortedAndFilteredSchool = useMemo(() => {
         return [...filteredSchool].sort((a, b) => {
             const cadetA = a.isCadetClass ? 1 : 0;
             const cadetB = b.isCadetClass ? 1 : 0;
-            if (cadetB !== cadetA) return cadetB - cadetA; // кадетские первыми (1 > 0)
+            if (cadetB !== cadetA) return cadetB - cadetA;
             const nameA = a.schoolName?.toLowerCase() || '';
             const nameB = b.schoolName?.toLowerCase() || '';
             return nameA.localeCompare(nameB);
         });
     }, [filteredSchool]);
 
+    // Группировка по microDistrictTitle
+    const groupedSchools = useMemo(() => {
+        const groups = {};
+        sortedAndFilteredSchool.forEach(school => {
+            const key = school.microDistrictTitle?.trim() || "Без микрорайона";
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(school);
+        });
+
+        // Разделяем на группы с названиями и группу "Без микрорайона"
+        const withNames = [];
+        const withoutName = [];
+
+        Object.entries(groups).forEach(([title, schools]) => {
+            if (title === "Без микрорайона") {
+                withoutName.push({ title, schools });
+            } else {
+                withNames.push({ title, schools });
+            }
+        });
+
+        // Сортируем группы с названиями по алфавиту
+        withNames.sort((a, b) => a.title.localeCompare(b.title));
+
+        // Сначала группы с названиями, потом "Без микрорайона"
+        return [...withNames, ...withoutName];
+    }, [sortedAndFilteredSchool]);
+
+    const microDistrictOptions = useMemo(() => {
+        const options = school.map(s => s.microDistrictTitle).filter(Boolean);
+        return [...new Set(options)];
+    }, [school]);
+
     const { exportToWord } = useDownloadTableWord({ filteredSchool: sortedAndFilteredSchool, data: district });
 
     const onEditStudent = (e) => {
         setEditSchool(e.row);
         open();
-    }
+    };
 
     useEffect(() => {
         getSchools(districtId);
-    }, [districtId])
+    }, [districtId]);
 
     return (
         <Stack p={'xs'} style={{ flex: '1', height: '100%' }} bg={'green'}>
             <Group gap={'xl'} mb={'lg'}>
                 <Stack c={'white'} gap={0}>
                     <Text fw={700}>{district?.name}</Text>
-                    {/* {data?.transferedAt && <Text fw={700}>Дата перевода: {data?.transferedAt ? new Date(data.transferedAt).toLocaleDateString() : ''}</Text>} */}
                 </Stack>
 
                 <Input
@@ -150,10 +145,7 @@ export default function DistrictTable() {
                     }
                 />
 
-                <Button
-                    variant="white"
-                    onClick={open}
-                >
+                <Button variant="white" onClick={open}>
                     Добавить школу
                 </Button>
             </Group>
@@ -168,49 +160,30 @@ export default function DistrictTable() {
                     checked={showOnlyCadetClasses}
                     onChange={(event) => setShowOnlyCadetClasses(event.currentTarget.checked)}
                     styles={{
-                        labelWrapper: {
-                            display: 'flex',
-                            alignItems: 'center',
-                        },
-                        label: {
-                            // если нужно подкорректировать отступы
-                            paddingLeft: 8,
-                        },
-                        body: {
-                            alignItems: 'center', // выравнивание чекбокса и label по центру
-                        }
+                        labelWrapper: { display: 'flex', alignItems: 'center' },
+                        label: { paddingLeft: 8 },
+                        body: { alignItems: 'center' }
                     }}
                 />
             </Group>
+
+            {/* Рендерим MicroTable для каждой группы */}
             <ScrollArea.Autosize>
-                <DataGrid
-                    rows={sortedAndFilteredSchool}
-                    columns={columns}
-                    disableColumnMenu
-                    hideFooter
-                    onRowClick={onEditStudent}
-                    disableRowSelectionOnClick
-                    //sortModel={sortModel}
-                    onSortModelChange={setSortModel}
-                    sortingOrder={['asc', 'desc']}
-                    getRowId={(row) => row.id}
-                    getRowClassName={(params) => {
-                        const evenOdd = params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd';
-                        const cadet = params.row?.isCadetClass ? ' cadet-class' : '';
-                        return evenOdd + cadet;
-                    }}
-                    sx={{
-                        border: 0,
-                        '& .even': { backgroundColor: '#f2f2f2' },
-                        '& .odd': { backgroundColor: '#ffffff' },
-                        '& .not-enrolled': { backgroundColor: '#fa6666' },
-                        '& .cadet-class': { backgroundColor: '#b3d4fc !important' },
-                    }}
-                />
+                <Stack>
+                    {groupedSchools.map(({ title, schools }) => (
+                        <MicroTable
+                            key={title}
+                            title={title}
+                            schools={schools}
+                            onRowClick={onEditStudent}
+                            onEditMicroDistrict={handleEditMicroDistrict}
+                        />
+                    ))}
+                </Stack>
             </ScrollArea.Autosize>
 
-            <Group justify="flex-end" w="100%">
-                <Text c={'white'} size="lg">Количество организаций: {sortedAndFilteredSchool.length}</Text>
+            <Group justify="flex-end" w="100%" mt={'5rem'}>
+                <Text c={'white'} size="lg" fw={700}>Количество районов: {groupedSchools.length}</Text>
             </Group>
 
             <SchoolModal
@@ -220,6 +193,14 @@ export default function DistrictTable() {
                 setSchool={setSchool}
                 editSchool={editSchool}
                 setEditSchool={setEditSchool}
+                microDistrictOptions={microDistrictOptions}
+            />
+
+            <MicroDistrictTableModal
+                opened={microModalOpened}
+                onClose={closeMicroModal}
+                currentTitle={currentMicroTitle}
+                onRename={handleRenameMicroDistrict}
             />
 
             <Dialog opened={openedDialog} withCloseButton onClose={closeDialog} size="lg" radius="md">

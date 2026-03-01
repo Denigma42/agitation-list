@@ -54,7 +54,6 @@ export default function DistrictModal({
 
     const handleEditDistrict = async () => {
         await updateDistrict(editDistrict.id, { name: districtName });
-        //setDistricts(prevDistricts => prevDistricts.map(district => district.id === editPlatoon.id ? { ...district, ...data } : district))
         onCloseModal();
         window.location.reload()
     }
