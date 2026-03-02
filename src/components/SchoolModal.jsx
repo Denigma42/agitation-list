@@ -13,36 +13,44 @@ export default function SchoolModal({
     setEditSchool,
     microDistrictOptions = [],
 }) {
+    console.log(editSchool);
+    
     const [schoolName, setSchoolName] = useState(editSchool?.schoolName || '');
-    const [isCadetClass, setIsCadetClass] = useState(editSchool?.isCadetClass || false);
-    const [classGroup, setClassGroup] = useState(editSchool?.classGroup || '');
-    const [responsible, setResponsible] = useState(editSchool?.responsible || '');
-    const [date, setDate] = useState(editSchool?.date || '');
     const [address, setAddress] = useState(editSchool?.address || '');
+    const [isCadetClass, setIsCadetClass] = useState(editSchool?.isCadetClass || false);
+    const [responsible, setResponsible] = useState(editSchool?.responsible || '');
+    const [contacts, setContacts] = useState(editSchool?.contacts || '');
+    const [date, setDate] = useState(editSchool?.date || '');
+    const [fioExecutor, setFioExecutore] = useState(editSchool?.fioExecutor || '');
+    const [note, setNote] = useState(editSchool?.note || '');
     const [microDistrictTitle, setMicroDistrictTitle] = useState(editSchool?.microDistrictTitle || '');
 
     const { addSchool } = useAddSchool();
     const { updateSchool } = useUpdateSchool();
     const { deleteSchool } = useDeleteSchool();
 
-    const disabledButtonAdd = !schoolName || !responsible || !date || !classGroup || !address;
+    const disabledButtonAdd = !schoolName || !address || !responsible || !contacts || !date || !fioExecutor
     const editButtonDisabled = disabledButtonAdd || (
         schoolName === editSchool.schoolName &&
         isCadetClass === editSchool.isCadetClass &&
         responsible === editSchool.responsible &&
         date === editSchool.date &&
-        classGroup === editSchool.classGroup &&
+        contacts === editSchool.contacts &&
         address === editSchool.address &&
+        fioExecutor === editSchool.fioExecutor &&
+        note === editSchool.note &&
         microDistrictTitle === editSchool.microDistrictTitle
     );
 
     const onCloseModal = () => {
         setSchoolName('');
         setIsCadetClass(false);
-        setClassGroup('');
+        setContacts('');
         setResponsible('');
         setDate('');
         setAddress('');
+        setFioExecutore('')
+        setNote('')
         setMicroDistrictTitle('');
         setEditSchool({});
         close();
@@ -53,11 +61,13 @@ export default function SchoolModal({
             id: Date.now().toString(),
             districtId: districtId,
             schoolName,
-            isCadetClass,
-            classGroup,
-            responsible,
-            date,
             address,
+            isCadetClass,
+            responsible,
+            contacts,
+            date,
+            fioExecutor,
+            note,
             microDistrictTitle,
         };
         const { data } = await addSchool(schoolObject);
@@ -69,11 +79,13 @@ export default function SchoolModal({
     const handleEditSchool = async () => {
         const { data } = await updateSchool(editSchool.id, {
             schoolName,
+            address,
             isCadetClass,
             responsible,
+            contacts,
             date,
-            classGroup,
-            address,
+            fioExecutor,
+            note,
             microDistrictTitle,
         });
         setSchool(prev => prev.map(s => s.id === editSchool.id ? { ...s, ...data } : s));
@@ -82,7 +94,7 @@ export default function SchoolModal({
     };
 
     const handleDeleteSchool = async () => {
-        const confirmed = window.confirm('Вы уверены, что хотите удалить эту школу?');
+        const confirmed = window.confirm('Вы уверены, что хотите удалить эту организацию?');
         if (!confirmed) return;
 
         await deleteSchool(editSchool.id);
@@ -94,10 +106,12 @@ export default function SchoolModal({
     useEffect(() => {
         setSchoolName(editSchool?.schoolName || "");
         setIsCadetClass(editSchool?.isCadetClass || false);
-        setClassGroup(editSchool?.classGroup || "");
+        setContacts(editSchool?.contacts || "");
         setResponsible(editSchool?.responsible || "");
         setDate(editSchool?.date || "");
         setAddress(editSchool?.address || "");
+        setFioExecutore(editSchool?.fioExecutor || "");
+        setNote(editSchool?.note || "");
         setMicroDistrictTitle(editSchool?.microDistrictTitle || "");
     }, [editSchool]);
 
@@ -106,7 +120,7 @@ export default function SchoolModal({
             opened={opened}
             onClose={onCloseModal}
             size={'50%'}
-            title={`${editSchool?.id ? "Изменить" : "Добавить"} школу`}
+            title={`${editSchool?.id ? "Изменить" : "Добавить"} организацию`}
             centered
             closeOnClickOutside={false}
         >
@@ -130,9 +144,9 @@ export default function SchoolModal({
                     </Stack>
 
                     <Stack gap={0}>
-                        <Text size="sm" c={'gray.7'} fs="italic">Ответственный</Text>
+                        <Text size="sm" c={'gray.7'} fs="italic">Ответственный за проф ориентацию</Text>
                         <Input
-                            placeholder="Ответственный"
+                            placeholder="Ответственный за проф ориентацию"
                             value={responsible}
                             onChange={(e) => setResponsible(e.target.value)}
                             rightSectionPointerEvents="all"
@@ -156,14 +170,14 @@ export default function SchoolModal({
                             onChange={(event) => setIsCadetClass(event.currentTarget.checked)}
                         />
                         <Input
-                            placeholder="Класс"
-                            value={classGroup}
-                            onChange={(e) => setClassGroup(e.target.value)}
+                            placeholder="Контактный телефон"
+                            value={contacts}
+                            onChange={(e) => setContacts(e.target.value)}
                             rightSectionPointerEvents="all"
                             rightSection={
                                 <CloseButton
-                                    onClick={() => setClassGroup("")}
-                                    style={{ display: classGroup ? undefined : 'none' }}
+                                    onClick={() => setContacts("")}
+                                    style={{ display: contacts ? undefined : 'none' }}
                                 />
                             }
                         />
@@ -184,9 +198,9 @@ export default function SchoolModal({
                         />
                     </Stack>
                     <Stack gap={0}>
-                        <Text size="sm" c={'gray.7'} fs="italic">Дата</Text>
+                        <Text size="sm" c={'gray.7'} fs="italic">Дата посещения</Text>
                         <Input
-                            placeholder="Дата"
+                            placeholder="Дата посещения"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                             rightSectionPointerEvents="all"
@@ -200,12 +214,46 @@ export default function SchoolModal({
                     </Stack>
                 </Group>
 
+                <Group justify="space-between" grow>
+                    <Stack gap={0}>
+                        <Text size="sm" c={'gray.7'} fs="italic">ФИО исполнителя</Text>
+                        <Input
+                            placeholder="ФИО исполнителя"
+                            value={fioExecutor}
+                            onChange={(e) => setFioExecutore(e.target.value)}
+                            rightSectionPointerEvents="all"
+                            rightSection={
+                                <CloseButton
+                                    onClick={() => setFioExecutore("")}
+                                    style={{ display: fioExecutor ? undefined : 'none' }}
+                                />
+                            }
+                        />
+                    </Stack>
+
+                    <Stack gap={0}>
+                        <Text size="sm" c={'gray.7'} fs="italic">Примечание (необязательно)</Text>
+                        <Input
+                            placeholder="Примечание"
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            rightSectionPointerEvents="all"
+                            rightSection={
+                                <CloseButton
+                                    onClick={() => setNote("")}
+                                    style={{ display: note ? undefined : 'none' }}
+                                />
+                            }
+                        />
+                    </Stack>
+                </Group>
+
                 {/* Поле микрорайона с автодополнением */}
                 <Group>
                     <Stack gap={0} style={{ flex: 1 }}>
-                        <Text size="sm" c={'gray.7'} fs="italic">Микрорайон</Text>
+                        <Text size="sm" c={'gray.7'} fs="italic">Район (необязательно)</Text>
                         <Autocomplete
-                            placeholder="Название микрорайона"
+                            placeholder="Название района"
                             value={microDistrictTitle}
                             onChange={setMicroDistrictTitle}
                             data={microDistrictOptions}

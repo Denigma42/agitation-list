@@ -22,10 +22,7 @@ const {
 
 const {
   getAllMicroDistricts,
-  getMicroDistrictById,
-  addMicroDistrict,
   updateMicroDistrict,
-  deleteMicroDistrict
 } = require('./microDistrictHooks.cjs');
 
 const fs = require('fs');
@@ -139,21 +136,10 @@ ipcMain.handle('get-all-micro-districts', async (event, districtId) => {
   return getAllMicroDistricts(districtId);
 });
 
-ipcMain.handle('get-micro-district-by-id', async (event, id) => {
-  return getMicroDistrictById(id);
-});
-
-ipcMain.handle('add-micro-district', async (event, data) => {
-  return addMicroDistrict(data);
-});
-
 ipcMain.handle('update-micro-district', async (event, id, data) => {
   return updateMicroDistrict(id, data);
 });
 
-ipcMain.handle('delete-micro-district', async (event, id) => {
-  return deleteMicroDistrict(id);
-});
 
 app.whenReady().then(async () => {
   await ensureDbInUserData();

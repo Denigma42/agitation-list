@@ -9,6 +9,8 @@ import useDownloadTableWord from "../hooks/useDownloadTableWord";
 import useImportDistrictsWord from "../hooks/useImportDistrictsWord";
 import MicroTable from "./MicroDistrictTable";
 import MicroDistrictTableModal from "./MicroDistrictTableModal";
+import { withoutMicroDistrictTitle } from "../consts";
+import useUpdateMicroDistrict from "../hooks/useUpdateMicroDistrict";
 
 export default function DistrictTable() {
     const { id: districtId } = useParams();
@@ -26,6 +28,7 @@ export default function DistrictTable() {
 
     const [microModalOpened, { open: openMicroModal, close: closeMicroModal }] = useDisclosure(false);
     const [currentMicroTitle, setCurrentMicroTitle] = useState('');
+    const { updateMicroDistrict } = useUpdateMicroDistrict();
 
     // Функция открытия модалки с выбранным микрорайоном
     const handleEditMicroDistrict = (title) => {
@@ -34,13 +37,19 @@ export default function DistrictTable() {
     };
 
     // Функция переименования (обновляет локальное состояние школ)
-    const handleRenameMicroDistrict = (newTitle) => {
+    const handleRenameMicroDistrict = async (oldTitle, newTitle) => {
         if (!newTitle || newTitle === currentMicroTitle) return;
+
+        // Обновляем локальное состояние
         setSchool(prev => prev.map(school =>
             school.microDistrictTitle === currentMicroTitle
                 ? { ...school, microDistrictTitle: newTitle }
                 : school
         ));
+
+        // Обновляем в базе данных
+        await updateMicroDistrict(oldTitle, newTitle);
+
         closeMicroModal();
     };
 
@@ -53,10 +62,12 @@ export default function DistrictTable() {
             const lowerSearch = search.trim().toLowerCase();
             result = result.filter(school =>
                 school.schoolName?.toLowerCase().includes(lowerSearch) ||
-                school.classGroup?.toLowerCase().includes(lowerSearch) ||
-                school.responsible?.toLowerCase().includes(lowerSearch) ||
-                school.date?.toLowerCase().includes(lowerSearch) ||
                 school.address?.toLowerCase().includes(lowerSearch) ||
+                school.responsible?.toLowerCase().includes(lowerSearch) ||
+                school.contacts?.toLowerCase().includes(lowerSearch) ||
+                school.date?.toLowerCase().includes(lowerSearch) ||
+                school.fioExecutor?.toLowerCase().includes(lowerSearch) ||
+                school.note?.toLowerCase().includes(lowerSearch) ||
                 school.microDistrictTitle?.toLowerCase().includes(lowerSearch)
             );
         }
@@ -84,7 +95,7 @@ export default function DistrictTable() {
     const groupedSchools = useMemo(() => {
         const groups = {};
         sortedAndFilteredSchool.forEach(school => {
-            const key = school.microDistrictTitle?.trim() || "Без микрорайона";
+            const key = school.microDistrictTitle?.trim() || withoutMicroDistrictTitle;
             if (!groups[key]) groups[key] = [];
             groups[key].push(school);
         });
@@ -94,7 +105,7 @@ export default function DistrictTable() {
         const withoutName = [];
 
         Object.entries(groups).forEach(([title, schools]) => {
-            if (title === "Без микрорайона") {
+            if (title === withoutMicroDistrictTitle) {
                 withoutName.push({ title, schools });
             } else {
                 withNames.push({ title, schools });
@@ -107,6 +118,10 @@ export default function DistrictTable() {
         // Сначала группы с названиями, потом "Без микрорайона"
         return [...withNames, ...withoutName];
     }, [sortedAndFilteredSchool]);
+
+    const microDistrictsCount = useMemo(() => {
+        return groupedSchools.filter(group => group.title !== withoutMicroDistrictTitle).length;
+    }, [groupedSchools]);
 
     const microDistrictOptions = useMemo(() => {
         const options = school.map(s => s.microDistrictTitle).filter(Boolean);
@@ -146,7 +161,7 @@ export default function DistrictTable() {
                 />
 
                 <Button variant="white" onClick={open}>
-                    Добавить школу
+                    Добавить организацию
                 </Button>
             </Group>
 
@@ -154,7 +169,7 @@ export default function DistrictTable() {
 
             <Group justify="flex-end">
                 <Checkbox
-                    label={<Text c="white">Показать только кадетские классы</Text>}
+                    label={<Text c="white">Учреждения с кадетскими классами</Text>}
                     size="xs"
                     color="indigo"
                     checked={showOnlyCadetClasses}
@@ -168,7 +183,7 @@ export default function DistrictTable() {
             </Group>
 
             {/* Рендерим MicroTable для каждой группы */}
-            <ScrollArea.Autosize>
+            <ScrollArea.Autosize flex={1}>
                 <Stack>
                     {groupedSchools.map(({ title, schools }) => (
                         <MicroTable
@@ -183,7 +198,7 @@ export default function DistrictTable() {
             </ScrollArea.Autosize>
 
             <Group justify="flex-end" w="100%" mt={'5rem'}>
-                <Text c={'white'} size="lg" fw={700}>Количество районов: {groupedSchools.length}</Text>
+                <Text c={'white'} size="lg" fw={700}>Количество районов: {microDistrictsCount}</Text>
             </Group>
 
             <SchoolModal

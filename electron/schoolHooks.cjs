@@ -43,8 +43,8 @@ function addSchool(newSchool) {
         fs.writeFileSync(studentsFilePath, JSON.stringify(data, null, 2));
         return { data: newSchool };
     } catch (error) {
-        console.error('Ошибка при добавлении школы:', error);
-        return { error: `Ошибка при добавлении школы: ${error}` };
+        console.error('Ошибка при добавлении организации:', error);
+        return { error: `Ошибка при добавлении организации: ${error}` };
     }
 }
 

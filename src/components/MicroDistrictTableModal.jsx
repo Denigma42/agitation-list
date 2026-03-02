@@ -12,7 +12,7 @@ export default function MicroDistrictTableModal({ opened, onClose, currentTitle,
 
     const handleSave = () => {
         if (!isSaveDisabled) {
-            onRename(newTitle.trim());
+            onRename(currentTitle, newTitle.trim());
         }
         onClose();
     };

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { app } = require('electron');
 
-const microDistrictsFilePath = path.join(app.getPath('userData'), './db/microDistricts.json');
+const microDistrictsFilePath = path.join(app.getPath('userData'), './db/schools.json');
 
 function initializeFile() {
     const dir = path.dirname(microDistrictsFilePath);
@@ -29,73 +29,44 @@ function getAllMicroDistricts(districtId) {
     }
 }
 
-function getMicroDistrictById(id) {
+function updateMicroDistrict(oldTitle, updatedData) {
     try {
-        const { data } = getAllMicroDistricts();
-        const micro = data.find(item => item.id === id);
-        return { data: micro };
-    } catch (error) {
-        console.error('Ошибка при поиске микрорайона:', error);
-        return { error: `Ошибка: ${error}` };
-    }
-}
+        const newTitle =
+            (updatedData && (updatedData.title || updatedData.newTitle)) ||
+            (typeof updatedData === 'string' ? updatedData : null);
 
-function addMicroDistrict(newMicro) {
-    try {
-        const { data } = getAllMicroDistricts();
-        // можно добавить проверку уникальности имени в пределах района, если нужно
-        data.push(newMicro);
-        fs.writeFileSync(microDistrictsFilePath, JSON.stringify(data, null, 2));
-        return { data: newMicro };
-    } catch (error) {
-        console.error('Ошибка при добавлении микрорайона:', error);
-        return { error: `Ошибка: ${error}` };
-    }
-}
-
-function updateMicroDistrict(id, updatedData) {
-    try {
-        const { data } = getAllMicroDistricts();
-        const index = data.findIndex(item => item.id === id);
-        if (index !== -1) {
-            const newData = [...data];
-            newData[index] = { ...newData[index], ...updatedData, id };
-            fs.writeFileSync(microDistrictsFilePath, JSON.stringify(newData, null, 2));
-            return { data: newData[index] };
-        } else {
-            return { error: 'Микрорайон не найден' };
+        if (!newTitle) {
+            return { error: 'Новое название микрорайона не указано' };
         }
+
+        const { data } = getAllMicroDistricts();
+
+        let updatedCount = 0;
+        const newData = data.map((school) => {
+            if (school.microDistrictTitle === oldTitle) {
+                updatedCount += 1;
+                return { ...school, microDistrictTitle: newTitle };
+            }
+            return school;
+        });
+
+        fs.writeFileSync(microDistrictsFilePath, JSON.stringify(newData, null, 2));
+
+        return {
+            data: {
+                updatedCount,
+                oldTitle,
+                newTitle,
+            },
+        };
     } catch (error) {
         console.error('Ошибка при обновлении микрорайона:', error);
         return { error: `Ошибка: ${error}` };
     }
 }
 
-function deleteMicroDistrict(id) {
-    try {
-        const { data } = getAllMicroDistricts();
-        const filtered = data.filter(item => item.id !== id);
-        fs.writeFileSync(microDistrictsFilePath, JSON.stringify(filtered, null, 2));
-
-        // Каскадное удаление школ этого микрорайона
-        const schoolsFilePath = path.join(app.getPath('userData'), './db/schools.json');
-        if (fs.existsSync(schoolsFilePath)) {
-            const schoolsContent = fs.readFileSync(schoolsFilePath, 'utf8');
-            const schools = JSON.parse(schoolsContent);
-            const filteredSchools = schools.filter(s => s.microDistrictId !== id);
-            fs.writeFileSync(schoolsFilePath, JSON.stringify(filteredSchools, null, 2));
-        }
-        return true;
-    } catch (error) {
-        console.error('Ошибка при удалении микрорайона:', error);
-        return false;
-    }
-}
 
 module.exports = {
     getAllMicroDistricts,
-    getMicroDistrictById,
-    addMicroDistrict,
     updateMicroDistrict,
-    deleteMicroDistrict
 };

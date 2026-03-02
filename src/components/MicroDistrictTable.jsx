@@ -1,15 +1,21 @@
 import { ScrollArea, Stack, Text, Group, Button } from "@mantine/core";
 import { DataGrid } from "@mui/x-data-grid";
-import { schoolColumns } from "../consts";
+import { schoolColumns, withoutMicroDistrictTitle } from "../consts";
 import { MdModeEdit } from "react-icons/md";
 
 export default function MicroTable({ title, schools, onRowClick, onEditMicroDistrict }) {
     return (
         <Stack gap="xs">
             <Group>
-                <Text fw={700} size="lg" c="white">{title}</Text>
+                <Text
+                    fw={700}
+                    size="lg"
+                    c={title == withoutMicroDistrictTitle ? 'red.9' : "white"}
+                >
+                    {title}
+                </Text>
 
-                {title !== "Без микрорайона" &&
+                {title !== withoutMicroDistrictTitle &&
                     <Button
                         variant="white"
                         size="xs"
@@ -35,6 +41,13 @@ export default function MicroTable({ title, schools, onRowClick, onEditMicroDist
                         return evenOdd + cadet;
                     }}
                     sx={{
+                        '& .MuiDataGrid-cell': {
+                            fontSize: '0.75rem', // можно изменить при необходимости
+                        },
+                        // Уменьшаем шрифт в заголовках
+                        '& .MuiDataGrid-columnHeader': {
+                            fontSize: '0.75rem',
+                        },
                         border: 0,
                         '& .even': { backgroundColor: '#f2f2f2' },
                         '& .odd': { backgroundColor: '#ffffff' },

@@ -10,10 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     deleteAllArchivedDistricts: () => ipcRenderer.invoke('delete-all-archived-districts'),
 
     getAllMicroDistricts: (districtId) => ipcRenderer.invoke('get-all-micro-districts', districtId),
-    getMicroDistrictById: (id) => ipcRenderer.invoke('get-micro-district-by-id', id),
-    addMicroDistrict: (data) => ipcRenderer.invoke('add-micro-district', data),
     updateMicroDistrict: (id, data) => ipcRenderer.invoke('update-micro-district', id, data),
-    deleteMicroDistrict: (id) => ipcRenderer.invoke('delete-micro-district', id),
 
     getAllSchools: (districtId) => ipcRenderer.invoke('get-all-schools', districtId),
     getSchoolById: (id) => ipcRenderer.invoke('get-school-by-id', id),
