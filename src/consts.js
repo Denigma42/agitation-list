@@ -5,20 +5,20 @@ export const STATUS_SCHOOL = ['Зачислен', 'Отстранён', 'Пер�
 export const STATUS_SCHOOL_KURSANT = ['Зачислен', 'Отчислен', 'Переведён'];
 
 export const schoolColumns = [
-    {
-        field: 'order',
-        headerName: '№',
-        width: 60,
-        headerAlign: 'center',
-        align: 'center',
-        resizable: false,
-        sortable: false,
-        filterable: false,
-        renderCell: (params) => {
-            const allRowIds = params.api.getAllRowIds();
-            return allRowIds.indexOf(params.id) + 1;
-        }
-    },
+    // {
+    //     field: 'order',
+    //     headerName: '№',
+    //     width: 60,
+    //     headerAlign: 'center',
+    //     align: 'center',
+    //     resizable: false,
+    //     sortable: false,
+    //     filterable: false,
+    //     renderCell: (params) => {
+    //         const allRowIds = params.api.getAllRowIds();
+    //         return allRowIds.indexOf(params.id) + 1;
+    //     }
+    // },
     {
         field: 'schoolName',
         headerName: 'Образовательная организация',
@@ -29,7 +29,7 @@ export const schoolColumns = [
     },
     {
         field: 'address',
-        headerName: 'Адрес',
+        headerName: 'Адрес, телефон',
         headerAlign: 'center',
         align: 'center',
         flex: 0.3,
@@ -48,7 +48,7 @@ export const schoolColumns = [
         headerName: 'Ответственный за проф ориентацию',
         headerAlign: 'center',
         align: 'center',
-        flex: 0.6,
+        flex: 0.4,
         resizable: false,
     },
     {
@@ -64,7 +64,7 @@ export const schoolColumns = [
         headerName: 'Дата посещения',
         headerAlign: 'center',
         align: 'center',
-        flex: 0.3,
+        flex: 0.2,
         resizable: false,
     },
     {
@@ -72,7 +72,7 @@ export const schoolColumns = [
         headerName: 'ФИО исполнителя',
         headerAlign: 'center',
         align: 'center',
-        flex: 0.3,
+        flex: 0.25,
         resizable: false,
     },
     {
@@ -80,7 +80,7 @@ export const schoolColumns = [
         headerName: 'Примечание',
         headerAlign: 'center',
         align: 'center',
-        flex: 0.3,
+        flex: 0.2,
         resizable: false,
     },
 ];

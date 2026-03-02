@@ -30,7 +30,7 @@ export default function SchoolModal({
     const { deleteSchool } = useDeleteSchool();
 
     const disabledButtonAdd = !schoolName || !address || !responsible || !contacts || !date || !fioExecutor
-    const editButtonDisabled = disabledButtonAdd || (
+    const editButtonDisabled = (
         schoolName === editSchool.schoolName &&
         isCadetClass === editSchool.isCadetClass &&
         responsible === editSchool.responsible &&

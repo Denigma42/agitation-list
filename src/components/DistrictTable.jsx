@@ -169,7 +169,7 @@ export default function DistrictTable() {
 
             <Group justify="flex-end">
                 <Checkbox
-                    label={<Text c="white">Учреждения с кадетскими классами</Text>}
+                    label={<Text c="white">СОШ с кадетскими классами</Text>}
                     size="xs"
                     color="indigo"
                     checked={showOnlyCadetClasses}

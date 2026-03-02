@@ -54,7 +54,7 @@ export default function DistrictList() {
     return (
         <Stack align="center" p={'xs'}>
             <Stack gap={0}>
-                <Text fw={700} size="xl" mb={'md'}>Округ</Text>
+                <Text fw={700} size="xl" mb={'md'}>Округа</Text>
 
                 <Group
                     align="center"

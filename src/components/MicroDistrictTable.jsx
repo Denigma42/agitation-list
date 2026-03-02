@@ -26,7 +26,7 @@ export default function MicroTable({ title, schools, onRowClick, onEditMicroDist
                 }
             </Group>
 
-            <ScrollArea.Autosize>
+            <ScrollArea.Autosize mb={'xl'}>
                 <DataGrid
                     rows={schools}
                     columns={schoolColumns}
